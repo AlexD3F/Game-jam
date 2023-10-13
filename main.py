@@ -12,7 +12,7 @@ screen = width, heigth = 1720, 1000
 font = pygame.font.SysFont('Verdana', 20)
 #general///////////////////////////
 
-#colour_list\\\\\\\\\ now can be launched, added controls, and added anim placeholder
+#colour_list\\\\\\\\\ 
 
 
 WHITE = 255, 255, 255
