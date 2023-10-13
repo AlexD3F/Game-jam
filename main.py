@@ -31,10 +31,10 @@ ball_rect = ball.get_rect()
 ball_speed = 7
 #ball/////////////////////////
 
+
+
 #enemy\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 def create_enemy():
-    #enemy = pygame.Surface((20, 20))
-    #enemy.fill(RED)
     enemy = pygame.image.load('imgs/enemy.png').convert_alpha()
     enemy_rect = pygame.Rect(width, random.randint(0, 800), *enemy.get_size())
     enemy_speed = random.randint(4, 8)
@@ -54,6 +54,19 @@ bg_speed = 3
 index = 0
 score = 0
 #background////////////////////////////////////////////////////////////////////////////////
+
+#bonus\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+def create_bonus():
+    bonus = pygame.image.load('imgs/bonus.png').convert_alpha()
+    bonus_rect = pygame.Rect(width, random.randint(0, 800), *bonus.get_size())
+    bonus_speed = random.randint(4, 8)
+    return [bonus, bonus_rect, bonus_speed]
+CREATE_BONUS = pygame.USEREVENT +2
+pygame.time.set_timer(CREATE_BONUS, 5000)
+
+bonuses =[]
+#bonus/////////////////////////////////////////////////
+
 
 change_img = pygame.USEREVENT +3
 pygame.time.set_timer(change_img, 125)
@@ -75,6 +88,11 @@ while is_working:
 
         if event.type == CREATE_ENEMY:
             enemies.append(create_enemy())
+
+        if event.type == CREATE_BONUS:
+            bonuses.append(create_bonus())
+
+
 
     pressed_keys = pygame.key.get_pressed()
 
@@ -100,6 +118,12 @@ while is_working:
         if ball_rect.colliderect(enemy[1]):
             is_working = False
 
+    for bonus in bonuses:
+        bonus[1] = bonus[1].move(-bonus[2], 0)
+        main_surface.blit(bonus[0], bonus[1])
+        if bonus[1].left < 0:
+            bonus.pop(bonus.index(bonus))
+
 
     #controles\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     if pressed_keys[K_s] and not ball_rect.bottom >= heigth:
@@ -113,6 +137,8 @@ while is_working:
 
     if pressed_keys[K_d] and not ball_rect.right >= width:
         ball_rect = ball_rect.move(ball_speed, 0)
+
+
     #controles//////////////////////////////////////
 
 
