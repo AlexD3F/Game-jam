@@ -31,6 +31,19 @@ ball_rect = ball.get_rect()
 ball_speed = 7
 #ball/////////////////////////
 
+#enemy\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+def create_enemy():
+    #enemy = pygame.Surface((20, 20))
+    #enemy.fill(RED)
+    enemy = pygame.image.load('erre/enemy.png').convert_alpha()
+    enemy_rect = pygame.Rect(width, random.randint(0, 800), *enemy.get_size())
+    enemy_speed = random.randint(1, 8)
+    return [enemy, enemy_rect, enemy_speed]
+CREATE_ENEMY = pygame.USEREVENT +1
+pygame.time.set_timer(CREATE_ENEMY, 1500)
+
+enemies =[]
+#enemy/////////////////////////////////////////////////
 
 #background\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 bg = pygame.transform.scale(pygame.image.load('imgs/background.png').convert(), screen)
