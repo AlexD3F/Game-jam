@@ -131,7 +131,7 @@ while is_working:
 
 
     #controles\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-    if pressed_keys[K_s] and not ball_rect.bottom >= heigth:
+    if pressed_keys[K_s] and not ball_rect.bottom >= 1600:
         ball_rect = ball_rect.move(0, ball_speed)
 
     if pressed_keys[K_w] and not ball_rect.top <= 0:
