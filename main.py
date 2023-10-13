@@ -7,7 +7,7 @@ pygame.init()
 
 FPS = pygame.time.Clock()
 
-screen = width, heigth = 1720, 1000
+screen = width, heigth = 1920, 1000
 
 font = pygame.font.SysFont('Verdana', 20)
 #general///////////////////////////
@@ -23,7 +23,7 @@ BLUE = 0, 0, 255
 
 main_surface = pygame.display.set_mode(screen)
 
-IP = 'imgs/anim'
+IP = 'imgs/f16anim'
 #ball\\\\\\\\\\\\\\\\\\\\\\\\\
 ball_imgs = [pygame.image.load(IP + '/' + file).convert_alpha() for file in listdir(IP)]
 ball = ball_imgs[0]
@@ -35,12 +35,12 @@ ball_speed = 7
 def create_enemy():
     #enemy = pygame.Surface((20, 20))
     #enemy.fill(RED)
-    enemy = pygame.image.load('erre/enemy.png').convert_alpha()
+    enemy = pygame.image.load('imgs/enemy.png').convert_alpha()
     enemy_rect = pygame.Rect(width, random.randint(0, 800), *enemy.get_size())
-    enemy_speed = random.randint(1, 8)
+    enemy_speed = random.randint(4, 8)
     return [enemy, enemy_rect, enemy_speed]
 CREATE_ENEMY = pygame.USEREVENT +1
-pygame.time.set_timer(CREATE_ENEMY, 1500)
+pygame.time.set_timer(CREATE_ENEMY, 3000)
 
 enemies =[]
 #enemy/////////////////////////////////////////////////
@@ -73,6 +73,8 @@ while is_working:
                  index = 0
              ball = ball_imgs[index]
 
+        if event.type == CREATE_ENEMY:
+            enemies.append(create_enemy())
 
     pressed_keys = pygame.key.get_pressed()
 
@@ -89,6 +91,14 @@ while is_working:
     main_surface.blit(ball, ball_rect)
     main_surface.blit(font.render(str(score), True, BLACK), (width - 30, 0))
 
+    for enemy in enemies:
+        enemy[1] = enemy[1].move(-enemy[2], 0)
+        main_surface.blit(enemy[0], enemy[1])
+        if enemy[1].left < 0:
+            enemies.pop(enemies.index(enemy))
+
+        if ball_rect.colliderect(enemy[1]):
+            is_working = False
 
 
     #controles\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
