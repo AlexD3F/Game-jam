@@ -15,9 +15,6 @@ font = pygame.font.SysFont('Verdana', 20)
 #colour_list\\\\\\\\\
 WHITE = 255, 255, 255
 BLACK = 0, 0, 0
-RED = 255, 0, 0
-GREEN = 0, 0, 255
-BLUE = 0, 0, 255
 #colour_list/////////
 
 
@@ -25,10 +22,13 @@ main_surface = pygame.display.set_mode(screen)
 
 IP = 'imgs/f16anim'
 #ball\\\\\\\\\\\\\\\\\\\\\\\\\
+
 ball_imgs = [pygame.image.load(IP + '/' + file).convert_alpha() for file in listdir(IP)]
-ball = ball_imgs[0]
-ball_rect = ball.get_rect()
+ball_rect = ball_imgs[0].get_rect()
+scaled_ball_imgs = [pygame.transform.scale(frame, (200, 200)) for frame in ball_imgs]
 ball_speed = 7
+# Scale the ball sprite
+
 #ball/////////////////////////
 
 
@@ -68,7 +68,7 @@ bonuses =[]
 #bonus/////////////////////////////////////////////////
 
 
-change_img = pygame.USEREVENT +3
+change_img = pygame.USEREVENT + 3
 pygame.time.set_timer(change_img, 125)
 
 is_working = True
@@ -81,16 +81,21 @@ while is_working:
         if event.type == QUIT:
             is_working = False
         if event.type == change_img:
-             index += 1
-             if index == len(ball_imgs):
-                 index = 0
-             ball = ball_imgs[index]
+            index += 1
+            if index == len(scaled_ball_imgs):
+                index = 0
 
         if event.type == CREATE_ENEMY:
             enemies.append(create_enemy())
 
         if event.type == CREATE_BONUS:
             bonuses.append(create_bonus())
+
+        if event.type == change_img:
+            index += 1
+            if index == len(scaled_ball_imgs):
+                index = 0
+            ball = scaled_ball_imgs[index]
 
 
 
@@ -106,8 +111,8 @@ while is_working:
     if bgx2 < -bg.get_width():
         bgx2 = bg.get_width()
 
+    ball = scaled_ball_imgs[index]
     main_surface.blit(ball, ball_rect)
-    main_surface.blit(font.render(str(score), True, BLACK), (width - 30, 0))
 
     for enemy in enemies:
         enemy[1] = enemy[1].move(-enemy[2], 0)
