@@ -12,9 +12,7 @@ screen = width, heigth = 1720, 1000
 font = pygame.font.SysFont('Verdana', 20)
 #general///////////////////////////
 
-#colour_list\\\\\\\\\ 
-
-
+#colour_list\\\\\\\\\
 WHITE = 255, 255, 255
 BLACK = 0, 0, 0
 RED = 255, 0, 0
@@ -25,7 +23,7 @@ BLUE = 0, 0, 255
 
 main_surface = pygame.display.set_mode(screen)
 
-IP = 'imgs/anim'
+IP = 'imgs/f16anim'
 #ball\\\\\\\\\\\\\\\\\\\\\\\\\
 ball_imgs = [pygame.image.load(IP + '/' + file).convert_alpha() for file in listdir(IP)]
 ball = ball_imgs[0]
@@ -33,8 +31,17 @@ ball_rect = ball.get_rect()
 ball_speed = 7
 #ball/////////////////////////
 
+#enemy\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+def create_enemy():
+    enemy = pygame.image.load('imgs/enemy.png').convert_alpha()
+    enemy_rect = pygame.Rect(width, random.randint(0, 800), *enemy.get_size())
+    enemy_speed = random.randint(1, 8)
+    return [enemy, enemy_rect, enemy_speed]
+CREATE_ENEMY = pygame.USEREVENT +1
+pygame.time.set_timer(CREATE_ENEMY, 1500)
 
-
+enemies =[]
+#enemy/////////////////////////////////////////////////
 
 #background\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 bg = pygame.transform.scale(pygame.image.load('imgs/background.png').convert(), screen)
@@ -59,6 +66,9 @@ while is_working:
         if event.type == QUIT:
             is_working = False
 
+        if event.type == CREATE_ENEMY:
+            enemies.append(create_enemy())
+
         if event.type == change_img:
              index += 1
              if index == len(ball_imgs):
@@ -82,7 +92,14 @@ while is_working:
     main_surface.blit(ball, ball_rect)
     main_surface.blit(font.render(str(score), True, BLACK), (width - 30, 0))
 
+    for enemy in enemies:
+        enemy[1] = enemy[1].move(-enemy[2], 0)
+        main_surface.blit(enemy[0], enemy[1])
+        if enemy[1].left < 0:
+            enemies.pop(enemies.index(enemy))
 
+        if ball_rect.colliderect(enemy[1]):
+            is_working = False
 
     #controles\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     if pressed_keys[K_s] and not ball_rect.bottom >= heigth:
