@@ -40,8 +40,14 @@ game_state = "menu"
 #enemy\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 def create_enemy():
     enemy = pygame.image.load('imgs/enemy.png').convert_alpha()
-    enemy_rect = pygame.Rect(width, random.randint(0, 800), *enemy.get_size())
+
+    # Scale the enemy image to your desired dimensions (e.g., 50x50 pixels)
+    scaled = random.randint(195, 200)
+    enemy = pygame.transform.scale(enemy, (scaled, scaled))
+
+    enemy_rect = pygame.Rect(width, random.randint(0, 900), *enemy.get_size())
     enemy_speed = random.randint(2, 3)
+
     return [enemy, enemy_rect, enemy_speed]
 
 enemy_creation_interval = random.randint(1500, 1800)  # Initial interval, in milliseconds
@@ -311,5 +317,3 @@ while True:
 
             # Break out of the game over loop to return to the main menu
             break
-
-
