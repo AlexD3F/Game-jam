@@ -44,7 +44,7 @@ def create_enemy():
     enemy_speed = random.randint(2, 3)
     return [enemy, enemy_rect, enemy_speed]
 
-enemy_creation_interval = 3000  # Initial interval, in milliseconds
+enemy_creation_interval = random.randint(1500, 1800)  # Initial interval, in milliseconds
 
 ENEMY_CREATION_EVENT = pygame.USEREVENT + 1
 
@@ -73,7 +73,6 @@ is_working = True
 projectiles = []
 last_shot_time = 0
 score = 0
-
 enemy_hit_count = {}
 
 #//////////////////////
@@ -246,7 +245,7 @@ while True:
                 time_since_last_shot = current_time - last_shot_time
 
                 # If enough time has passed (around 2000 ms for 2 seconds), allow shooting
-                if time_since_last_shot >= 700:
+                if time_since_last_shot >= 520:
                     # Create a projectile at the player's current position
                     projectile = pygame.Rect(ball_rect.centerx, ball_rect.centery, 10, 5)
                     projectiles.append(projectile)
@@ -271,9 +270,9 @@ while True:
         score_text = font.render("Score: " + str(score), True, WHITE)
 
         main_surface.blit(game_over_text, (
-        width // 2 - game_over_text.get_width() // 2, height // 2 - game_over_text.get_height() // 2))
+        width // 2 - game_over_text.get_width() // 2, height // 2.35 - game_over_text.get_height() // 2))
         main_surface.blit(score_text,
-                          (width // 2 - score_text.get_width() // 2, height // 2 + game_over_text.get_height() // 2))
+                          (width // 2 - score_text.get_width() // 2, height // 2.35 + game_over_text.get_height() // 2))
 
         # Draw the "Menu" button
         pygame.draw.rect(main_surface, menu_button_color, menu_button)
