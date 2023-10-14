@@ -2,13 +2,13 @@ import pygame
 import random
 from pygame. constants import QUIT, K_s, K_w, K_a, K_d, K_SPACE, K_q
 from os import listdir
+import pygame.mixer
+
 #general\\\\\\\\\\\\\\\\\\\\\\\\\\\
 pygame.init()
-
+pygame.mixer.init()
 FPS = pygame.time.Clock()
-
 screen = width, height = 1920, 1000
-
 font = pygame.font.SysFont('Verdana', 20)
 #general///////////////////////////
 
@@ -31,10 +31,29 @@ ball_speed = 8
 
 #ball/////////////////////////
 
-
-
+start_button_images = pygame.image.load('imgs/buttons/menub.png').convert_alpha()
+start_button_image = pygame.transform.scale(start_button_images, (200, 60))
+stop_button_images = pygame.image.load('imgs/buttons/Stop.png').convert_alpha()
+stop_button_image = pygame.transform.scale(stop_button_images, (200, 60))
+menu_button_images = pygame.image.load('imgs/buttons/menub.png').convert_alpha()
+menu_button_image = pygame.transform.scale(menu_button_images, (200, 60))
 # Game state
 game_state = "menu"
+
+
+last_eng = 0
+
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\
+#sound
+shoot_sound = pygame.mixer.Sound('sounds/shoot.wav')
+eng_sound = pygame.mixer.Sound('sounds/engine.mp3')
+exp_sound = pygame.mixer.Sound('sounds/hq-explosion-6288.mp3')
+kill_sound = pygame.mixer.Sound('sounds/kill.mp3')
+shoot_sound.set_volume(0.25)
+eng_sound.set_volume(0.25)
+exp_sound.set_volume(0.5)
+#/////////////////////////
 
 
 #enemy\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -67,6 +86,8 @@ bg_speed = 3
 menubg = pygame.transform.scale(pygame.image.load('imgs/menu.png').convert(), screen)
 index = 0
 score = 0
+timse_since_last_shot_sound = 1000
+exps = 1
 #background////////////////////////////////////////////////////////////////////////////////
 
 
@@ -168,6 +189,14 @@ while True:
 
         elif game_state == "playing":
 
+            time_since_eng = current_time - last_eng
+            if time_since_eng >= 4000:
+                # Create a projectile at the player's current position
+                eng_sound.play()
+
+
+                # Update the last shot time
+                last_eng = current_time
 
             bgx -= bg_speed
             bgx2 -= bg_speed
@@ -211,6 +240,7 @@ while True:
                     enemies.remove(enemy)
                     del enemy_hit_count[i]
                     score += 1
+                    kill_sound.play()
 
 
             #gpt////////////
@@ -255,22 +285,30 @@ while True:
                     # Create a projectile at the player's current position
                     projectile = pygame.Rect(ball_rect.centerx, ball_rect.centery, 10, 5)
                     projectiles.append(projectile)
-
+                    if  timse_since_last_shot_sound >= 1000:
+                        shoot_sound.play()
+                        timse_since_last_shot_sound = current_time
                     # Update the last shot time
                     last_shot_time = current_time
-            if pressed_keys[K_q]:
-                score +=1
+            #if pressed_keys[K_q]:
+            #    score +=1
+
             #controles//////////////////////////////////////
 
         if game_state == "menu":
             # Draw buttons
-            pygame.draw.rect(main_surface, start_button_color, start_button)
-            pygame.draw.rect(main_surface, quit_button_color, quit_button)
+            main_surface.blit(start_button_image, start_button)
+            main_surface.blit(stop_button_image, quit_button)
 
         pygame.display.flip()
 
 #DO NOT TOUCH!!!!!!!!!!!!!!!!!!!!!!!
     while True:
+        eng_sound.stop()
+        shoot_sound.stop()
+        if exps == 1:
+            exp_sound.play()
+            exps = 0
         game_over_text = font.render("Game Over", True, WHITE)
         score_text = font.render("Score: " + str(score), True, WHITE)
 
@@ -311,7 +349,7 @@ while True:
             score = 0  # Reset the score or any other relevant game variables
             ball_rect = pygame.Rect(80, 100, 200, 200)
             is_working = True
-
+            exps = 1
             # Additional initialization as needed
 
             # Break out of the game over loop to return to the main menu
