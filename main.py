@@ -24,7 +24,7 @@ IP = 'imgs/f16anim'
 #ball\\\\\\\\\\\\\\\\\\\\\\\\\
 
 ball_imgs = [pygame.image.load(IP + '/' + file).convert_alpha() for file in listdir(IP)]
-ball_rect = pygame.Rect(0, 0, 150, 150)
+ball_rect = pygame.Rect(80, 500, 150, 150)
 scaled_ball_imgs = [pygame.transform.scale(frame, (150, 150)) for frame in ball_imgs]
 ball_speed = 8
 # Scale the ball sprite
@@ -64,7 +64,7 @@ bg = pygame.transform.scale(pygame.image.load('imgs/background.png').convert(), 
 bgx = 0
 bgx2 = bg.get_width()
 bg_speed = 3
-
+menubg = pygame.transform.scale(pygame.image.load('imgs/menu.png').convert(), screen)
 index = 0
 score = 0
 #background////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +102,7 @@ menu_button_color = (255, 0, 0)
 menu_text = button_font.render("Menu", True, (255, 255, 255))
 
 while True:
-
+    main_surface.blit(menubg, (0, 0))
     while is_working:
         FPS.tick(60)
 
@@ -240,7 +240,7 @@ while True:
             if pressed_keys[K_w] and not ball_rect.top <= 0:
                 ball_rect = ball_rect.move(0, -ball_speed)
 
-            if pressed_keys[K_a] and not ball_rect.left <= 0:
+            if pressed_keys[K_a] and not ball_rect.left <= 79:
                 ball_rect = ball_rect.move(-ball_speed, 0)
 
             if pressed_keys[K_d] and not ball_rect.right >= width:
@@ -271,7 +271,6 @@ while True:
 
 #DO NOT TOUCH!!!!!!!!!!!!!!!!!!!!!!!
     while True:
-        main_surface.fill(BLACK)
         game_over_text = font.render("Game Over", True, WHITE)
         score_text = font.render("Score: " + str(score), True, WHITE)
 
@@ -310,7 +309,7 @@ while True:
             projectiles = []
             enemies = []
             score = 0  # Reset the score or any other relevant game variables
-            ball_rect = pygame.Rect(0, 0, 200, 200)
+            ball_rect = pygame.Rect(80, 100, 200, 200)
             is_working = True
 
             # Additional initialization as needed
