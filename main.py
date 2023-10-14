@@ -1,6 +1,6 @@
 import pygame
 import random
-from pygame. constants import QUIT, K_s, K_w, K_a, K_d, K_SPACE
+from pygame. constants import QUIT, K_s, K_w, K_a, K_d, K_SPACE, K_q
 from os import listdir
 #general\\\\\\\\\\\\\\\\\\\\\\\\\\\
 pygame.init()
@@ -24,8 +24,8 @@ IP = 'imgs/f16anim'
 #ball\\\\\\\\\\\\\\\\\\\\\\\\\
 
 ball_imgs = [pygame.image.load(IP + '/' + file).convert_alpha() for file in listdir(IP)]
-ball_rect = pygame.Rect(0, 0, 200, 200)
-scaled_ball_imgs = [pygame.transform.scale(frame, (200, 200)) for frame in ball_imgs]
+ball_rect = pygame.Rect(0, 0, 150, 150)
+scaled_ball_imgs = [pygame.transform.scale(frame, (150, 150)) for frame in ball_imgs]
 ball_speed = 8
 # Scale the ball sprite
 
@@ -41,10 +41,14 @@ game_state = "menu"
 def create_enemy():
     enemy = pygame.image.load('imgs/enemy.png').convert_alpha()
     enemy_rect = pygame.Rect(width, random.randint(0, 800), *enemy.get_size())
-    enemy_speed = random.randint(4, 7)
+    enemy_speed = random.randint(2, 3)
     return [enemy, enemy_rect, enemy_speed]
-CREATE_ENEMY = pygame.USEREVENT +1
-pygame.time.set_timer(CREATE_ENEMY, 3000)
+
+enemy_creation_interval = 3000  # Initial interval, in milliseconds
+
+ENEMY_CREATION_EVENT = pygame.USEREVENT + 1
+
+pygame.time.set_timer(ENEMY_CREATION_EVENT, enemy_creation_interval)
 
 enemies =[]
 #enemy/////////////////////////////////////////////////
@@ -69,6 +73,9 @@ is_working = True
 projectiles = []
 last_shot_time = 0
 score = 0
+
+enemy_hit_count = {}
+
 #//////////////////////
 
 start_button = pygame.Rect(width // 2 - 100, height // 2, 200, 50)
@@ -90,11 +97,23 @@ menu_button_color = (255, 0, 0)
 menu_text = button_font.render("Menu", True, (255, 255, 255))
 
 while True:
-    while is_working:
 
+    while is_working:
         FPS.tick(60)
 
         current_time = pygame.time.get_ticks()  # Get the current times
+
+        if score >= 15:
+            if score < 30:
+                enemy_creation_interval = 2500  # Initial interval, in milliseconds
+            else:
+                if score < 45:
+                    enemy_creation_interval = 2000  # Initial interval, in milliseconds
+                else:
+                    if score < 60:
+                        enemy_creation_interval = 1500  # Initial interval, in milliseconds
+                    else:
+                        enemy_creation_interval = 1000  # Initial interval, in milliseconds
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -104,7 +123,7 @@ while True:
                 if index == len(scaled_ball_imgs):
                     index = 0
 
-            if event.type == CREATE_ENEMY:
+            if event.type == ENEMY_CREATION_EVENT:
                 enemies.append(create_enemy())
 
             if event.type == change_img:
@@ -157,10 +176,38 @@ while True:
 
             ball = scaled_ball_imgs[index]
             main_surface.blit(ball, ball_rect)
+
+            for i, enemy in enumerate(enemies):
+                enemy[1] = enemy[1].move(-enemy[2], 0)
+                main_surface.blit(enemy[0], enemy[1])
+
             #gpt\\\\\\\\\\\\
             for projectile in projectiles:
                 projectile.x += 10  # Adjust the speed and direction of projectiles
                 pygame.draw.rect(main_surface, WHITE, projectile)  # Draw the projectiles
+
+            for i, enemy in enumerate(enemies.copy()):
+                # If this enemy is not in the hit count dictionary, add it
+                if i not in enemy_hit_count:
+                    enemy_hit_count[i] = 0
+
+                enemy[1] = enemy[1].move(-enemy[2], 0)
+                main_surface.blit(enemy[0], enemy[1])
+
+                # Check for collisions with shots and update hit counts
+                for projectile in projectiles:
+                    if enemy[1].colliderect(projectile):
+                        # Increment the hit count for the enemy and remove the projectile
+                        enemy_hit_count[i] += 1
+                        projectiles.remove(projectile)
+
+                # Check if the enemy has been hit twice and mark it for removal
+                if enemy_hit_count[i] >= 2:
+                    enemies.remove(enemy)
+                    del enemy_hit_count[i]
+                    score += 1
+
+
             #gpt////////////
             for enemy in enemies:
                 enemy[1] = enemy[1].move(-enemy[2], 0)
@@ -206,7 +253,8 @@ while True:
 
                     # Update the last shot time
                     last_shot_time = current_time
-
+            if pressed_keys[K_q]:
+                score +=1
             #controles//////////////////////////////////////
 
         if game_state == "menu":
